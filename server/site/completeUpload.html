@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Upload document</title>
+    <style>
+        body {
+            background: #171717;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .server-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #3d3d3d;
+            max-width: 500px;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 30px;
+            color: white;
+            font-family: system-ui;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .server-container h2 {
+            padding-inline: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input {
+            border: 1px solid white;
+            padding: 1rem 3rem 1rem 3rem;
+            margin-bottom: 2rem;
+            border-radius: 74px;
+            cursor: pointer;
+        }
+
+        a {
+            text-decoration: none;
+            background: #56a2fa;
+            border: none;
+            padding: .7rem 2rem .7rem 2rem;
+            text-align: center;
+            color: #000000;
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+
+        button {
+            background: #66f266;
+            border: none;
+            padding: .9rem 2rem .7rem 2rem;
+            text-align: center;
+            color: #000000;
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="server-container">
+        <h2>🚀 Document loaded and indexed correctly!</h2>
+        <a href="/">Upload another file</a>
+
+        <h2 style="margin-top: 2rem;">Now ask me a question</h2>
+        <input type="text" id="user-query" required />
+        <button onclick="sendQuery()">Send</button>
+    </div>
+
+
+    <script>
+        function sendQuery() {
+            const query = document.getElementById('user-query').value;
+
+            fetch('/api/rag', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query })
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Risposta: " + data.answer);
+                })
+                .catch(err => {
+                    console.error("Fetch error:", err);
+                    alert("Request error.");
+                });
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,27 @@
+{
+  "name": "rag-backend",
+  "version": "1.0.0",
+  "description": "A custom RAG server integrated with Express and Pinecone",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "IF exist uploads ( echo uploads exists ) ELSE ( mkdir uploads && echo uploads created)",
+    "start": "node server/index.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@pinecone-database/pinecone": "^5.1.1",
+    "cheerio": "^1.0.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "fs": "^0.0.1-security",
+    "mammoth": "^1.9.0",
+    "multer": "^1.4.5-lts.2",
+    "openai": "^4.88.0",
+    "path": "^0.12.7",
+    "pdf-parse": "^1.1.1",
+    "pinecone-client": "^2.0.0"
+  }
+}

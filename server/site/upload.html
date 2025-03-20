@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="it">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Upload Documento per RAG</title>
+    <style>
+        body {
+            background: #171717;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        .server-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #3d3d3d;
+            max-width: 500px;
+            margin: auto;
+            padding: 2rem;
+            border-radius: 30px;
+            color: white;
+            font-family: system-ui;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        .server-container h2 {
+            padding-inline: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        input {
+            border: 1px solid white;
+            padding: 1rem 3rem 1rem 3rem;
+            margin-bottom: 2rem;
+            border-radius: 74px;
+            cursor: pointer;
+        }
+
+        button {
+            background: #66f266;
+            border: none;
+            padding: .9rem 2rem .7rem 2rem;
+            text-align: center;
+            color: #000000;
+            font-size: 1rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            border-radius: 60px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="server-container">
+        <h2>Upload a document to be indexed in your agent's knowledge base</h2>
+        <form action="/api/upload" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" required />
+            <button type="submit">Upload</button>
+        </form>
+    </div>
+</body>
+
+</html>
