@@ -61,30 +61,32 @@ app.get('/', (req, res) => {
 
 
 // ---------------------------- 
-// Endpoint Upload 
+//  Upload Endpoint
 // ----------------------------  
-app.post('/api/upload', upload.single('file'), async (req, res) => {
+app.post('/api/upload', upload.array('files', CONFIG.upload.maxFiles), async (req, res) => {
     try {
-        const filePath = path.resolve(req.file.path);
-        await uploadDocument(filePath);
+        const filePaths = req.files.map(file => path.resolve(file.path));
+        await Promise.all(filePaths.map(uploadDocument));
         clearUploadsFolder();
-        res.sendFile(path.join(__dirname, 'site', 'completeUpload.html'));
+        res.json({ success: req.files.length, message: "Files uploaded successfully." });
     } catch (error) {
-        console.error("Error while uploading document:", error);
-        res.status(500).send("Document upload error.");
+        console.error("Upload error:", error);
+        res.status(500).json({ error: "Upload failed." });
     }
 });
 
 
+
+
 // ---------------------------- 
-// Endpoint RAG  
+// RAG Endpoint 
 // ----------------------------  
 app.post('/api/rag', async (req, res) => {
     const { query } = req.body;
 
     try {
         const queryEmbeddingRes = await openai.embeddings.create({
-            model: 'text-embedding-ada-002',
+            model: 'text-embedding-3-small',
             input: query,
         });
 

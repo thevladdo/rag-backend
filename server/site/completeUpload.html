@@ -22,6 +22,7 @@
             max-width: 500px;
             margin: auto;
             padding: 2rem;
+            padding-bottom: 2.2rem;
             border-radius: 30px;
             color: white;
             font-family: system-ui;
@@ -80,10 +81,10 @@
 
 <body>
     <div class="server-container">
-        <h2>🚀 Document loaded and indexed correctly!</h2>
+        <h2 style=" margin-bottom: 0;">🚀</h2>
+        <h2>Document loaded and indexed correctly!</h2>
         <a href="/">Upload another file</a>
-
-        <h2 style="margin-top: 2rem;">Now ask me a question</h2>
+        <h2 style="margin-top: 5rem; margin-bottom: 1.2rem;">or ask me a question</h2>
         <input type="text" id="user-query" required />
         <button onclick="sendQuery()">Send</button>
     </div>

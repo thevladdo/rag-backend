@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Upload Documento per RAG</title>
+    <title>Upload Document</title>
     <style>
         body {
             background: #171717;
@@ -39,6 +39,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            width: 100%;
         }
 
         input {
@@ -61,17 +62,54 @@
             border-radius: 60px;
             cursor: pointer;
         }
+
+        .loading {
+            position: absolute;
+            bottom: 15vh;
+            background: #c57000;
+            padding: 1rem 7rem;
+            border-radius: 500px;
+            font-weight: 700;
+            color: #fff;
+            text-align: center;
+            display: none;
+        }
     </style>
 </head>
 
 <body>
     <div class="server-container">
         <h2>Upload a document to be indexed in your agent's knowledge base</h2>
-        <form action="/api/upload" method="post" enctype="multipart/form-data">
-            <input type="file" name="file" required />
-            <button type="submit">Upload</button>
+        <form id="uploadForm" enctype="multipart/form-data">
+            <input type="file" name="files" id="fileInput" multiple required>
+            <button type="submit">Carica</button>
         </form>
+        <p class="loading" id="loadingText">Uploading...</p>
     </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const formData = new FormData();
+            const files = document.getElementById('fileInput').files;
+            for (let i = 0; i < files.length; i++) {
+                formData.append('files', files[i]);
+            }
+            document.getElementById('loadingText').style.display = 'block';
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    window.location.href = '/completeUpload.html';
+                })
+                .catch(error => {
+                    alert("Errore during upload");
+                    console.error(error);
+                });
+        });
+    </script>
 </body>
 
 </html>

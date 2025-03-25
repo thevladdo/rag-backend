@@ -15,7 +15,7 @@ A **RAG** system answers questions using uploaded documents, automatically retri
 **① Preparation Phase:**
 - Upload documents (`PDF`, `DOCX`, `HTML`, `TXT`) via the `/api/upload` endpoint.
 - Automatically split text into chunks.
-- Generate numerical embeddings using OpenAI (`text-embedding-ada-002`).
+- Generate numerical embeddings using OpenAI (`text-embedding-3-small`).
 - Store embeddings in Pinecone for fast retrieval.
 
 **② Usage Phase:**
@@ -51,7 +51,9 @@ A **RAG** system answers questions using uploaded documents, automatically retri
 │  └─ 📂 site
 │     ├─ 📄 completeUpload.html
 │     └─ 📄 upload.html
-└─ 📂 uploads
+├─ 📂 uploads
+└─ 📂 scripts
+    └─📄 htmlToFolder.py
 ```
 
 ---
