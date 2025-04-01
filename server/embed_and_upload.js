@@ -6,6 +6,8 @@ const cheerio = require('cheerio');
 const { OpenAI } = require('openai');
 const { Pinecone } = require('@pinecone-database/pinecone');
 const CONFIG = require('./config');
+const axios = require('axios');
+const FormData = require('form-data');
 require('dotenv').config();
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -13,7 +15,8 @@ const pinecone = new Pinecone({ apiKey: process.env.PINECONE_API_KEY });
 const index = pinecone.index(process.env.PINECONE_INDEX_NAME);
 
 // ---------------------------- 
-//  Parsing functions
+//  Parsing functions ---- deprecated
+//  Use Docling instead
 // ----------------------------  
 async function parsePDF(filePath) {
     const dataBuffer = fs.readFileSync(filePath);
@@ -38,7 +41,8 @@ function parseTxt(filePath) {
 
 
 // ---------------------------- 
-//  Choose the right parser based on file extension
+//  Choose the right parser based on file extension ---- deprecated
+//  Use Docling instead
 // ----------------------------  
 async function parseDocument(filePath) {
     const ext = path.extname(filePath).toLowerCase();
@@ -51,6 +55,39 @@ async function parseDocument(filePath) {
         default: throw new Error(`Unsupported format: ${ext}`);
     }
 }
+
+
+// ----------------------------
+//  Parsing document in Docling preprocessor
+//  This function sends the document to the Docling microservice for parsing
+// ---------------------------- 
+async function parseDocumentDoclingMS(filePath) {
+    const formData = new FormData();
+    formData.append('file', fs.createReadStream(filePath));
+
+    try {
+        const response = await axios.post('http://localhost:8000/preprocess/', formData, {
+            headers: formData.getHeaders()
+        });
+        if (response.data.error) throw new Error(response.data.error);
+        return extractTextFromDoclingOutput(response.data);
+    } catch (error) {
+        console.error("Error durting MS processing:", error);
+        throw error;
+    }
+}
+
+
+// ----------------------------
+//  Function to convert JSON output from Docling to plain text
+// ----------------------------  
+function extractTextFromDoclingOutput(parsedJson) {
+    if (parsedJson.texts && Array.isArray(parsedJson.texts)) {
+        return parsedJson.texts.map(item => item.text).join(" ");
+    }
+    throw new Error("Docling output does not contain a 'texts' array");
+}
+
 
 // ---------------------------- 
 //  Chunking Optimization
@@ -65,6 +102,7 @@ function chunkText(text, chunkSize = CONFIG.chunk.size, overlap = CONFIG.chunk.o
     }
     return chunks;
 }
+
 
 // ----------------------------
 //  Batch Embedding and Upload
@@ -89,17 +127,19 @@ async function embedAndUploadChunks(fileId, chunks) {
     }
 }
 
+
 // ---------------------------- 
 //  Upload Document
 // ----------------------------  
 async function uploadDocument(filePath) {
     try {
-        console.log(`Processing document: ${filePath}`);
-        const text = await parseDocument(filePath);
+        console.log(`📑 Processing document via Docling Microservice: ${filePath}`);
+        const text = await parseDocumentDoclingMS(filePath);
         const chunks = chunkText(text);
         const fileId = path.basename(filePath, path.extname(filePath));
         await embedAndUploadChunks(fileId, chunks);
-        console.log(`✅ Document "${filePath}" uploaded successfully.`);
+        console.log(`✅ Document "${filePath}" processed and uploaded successfully.`);
+
     } catch (err) {
         console.error(`❌ Error processing document: ${err.message}`);
     }

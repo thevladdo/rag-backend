@@ -23,7 +23,7 @@ def move_html_files(src_dir, dest_dir):
                 shutil.move(src_file, dest_file)
                 print(f"Moved successfully ---------- {file} ")
  
-src_directory = "./onlyHtml-old" 
+src_directory = "./old-HTML" 
 dest_directory = "onlyHtml"
  
 move_html_files(src_directory, dest_directory) 

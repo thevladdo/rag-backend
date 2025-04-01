@@ -17,6 +17,10 @@ const CONFIG = {
         port: 5001,
         uploadDir: 'uploads/',
         cacheTTL: 3600 // time to live for cache
+    },
+    docling: {
+        port: 8000,
+        url: 'http://localhost:8000/preprocess/',
     }
 };
 

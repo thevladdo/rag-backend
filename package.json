@@ -5,17 +5,19 @@
   "main": "index.js",
   "scripts": {
     "prestart": "IF exist uploads ( echo uploads exists ) ELSE ( mkdir uploads && echo uploads created)",
-    "start": "node server/index.js"
+    "start:rag": "node server/index.js",
+    "docker:build-docling": "docker build -t docling-microservice ./docling-microservice",
+    "start:docling": "docker run -p 8000:8000 docling-microservice",
+    "start": "npm run docker:build-docling && concurrently \"npm run start:rag\" \"npm run start:docling\""
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@pinecone-database/pinecone": "^5.1.1",
+    "axios": "1.8.4",
     "cheerio": "^1.0.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "form-data": "^4.0.2",
     "fs": "^0.0.1-security",
     "mammoth": "^1.9.0",
     "multer": "^1.4.5-lts.2",
@@ -23,5 +25,8 @@
     "path": "^0.12.7",
     "pdf-parse": "^1.1.1",
     "pinecone-client": "^2.0.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
   }
 }
