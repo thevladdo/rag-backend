@@ -1,13 +1,11 @@
 # Modular RAG Server with OpenAI, Pinecone, and Docling
 
 <p align="center">
- <img src=https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=fff&style=flat)" alt="Express.js" />
- <img src=https://img.shields.io/badge/node.js-339933?style=flat&logo=Node.js&logoColor=white)" alt="Node.js" />
- <img src=https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white)alt="OpenAI" />
- <img src=https://img.shields.io/badge/Pinecone-000000?style=flat&logo=pinecone&logoColor=white)" alt="Pinecone" />
- <img src=https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)" alt="Docker" />
- <img src=https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)"
-    alt="Python" />
+  <img src="https://img.shields.io/badge/Express.js-000000?logo=express&logoColor=fff&style=flat" alt="Express.js" />
+  <img src="https://img.shields.io/badge/node.js-339933?style=flat&logo=Node.js&logoColor=white" alt="Node.js" />
+  <img src="https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white" alt="OpenAI" />
+  <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker" />
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" alt="Python" />
 </p>
 
 This repository implements a custom **Retrieval-Augmented Generation (RAG)** server using **Express.js**, **OpenAI**, **Pinecone**, and a dedicated **Docling** microservice for document preprocessing. Its modular architecture gives you complete control over the LLM APIs, allowing you to choose and switch between different models for embedding and generation while using a single vector database for retrieval.
