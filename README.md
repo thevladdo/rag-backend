@@ -69,6 +69,10 @@ A **RAG** system answers questions by retrieving the most relevant documents and
 
 ```
 📦 rag-backend
+├─📂 crawl-microservice
+│  ├─ 📄 app.py
+│  ├─ 📄 Dockerfile
+│  └─ 📄 requirements.txt
 ├─📂 docling-microservice
 │  ├─ 📄 app.py
 │  ├─ 📄 Dockerfile
