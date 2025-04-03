@@ -14,6 +14,11 @@
             height: 100vh;
         }
 
+        p {
+            margin-top: -1rem;
+            font-size: 0.8rem;
+        }
+
         .server-container {
             display: flex;
             flex-direction: column;
@@ -42,12 +47,22 @@
             width: 100%;
         }
 
+        form#uploadFormUrl {
+            margin-top: 1rem;
+        }
+
+        form#uploadForm {
+            margin-bottom: 5rem;
+        }
+
         input {
             border: 1px solid white;
             padding: 1rem 3rem 1rem 3rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             border-radius: 74px;
             cursor: pointer;
+            background: transparent;
+            min-width: 280px;
         }
 
         button {
@@ -63,6 +78,10 @@
             cursor: pointer;
         }
 
+        .secondary-button {
+            background: #a7a7a7;
+        }
+
         .loading {
             position: absolute;
             bottom: 15vh;
@@ -74,18 +93,44 @@
             text-align: center;
             display: none;
         }
+
+        .white-link {
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration-style: wavy;
+        }
     </style>
 </head>
 
 <body>
-    <div class="server-container">
-        <h2>Upload a document to be indexed in your agent's knowledge base</h2>
+    <div class="server-container" id="initialContainer">
+        <h3>Upload a document to be indexed in your agent's knowledge base</h3>
         <form id="uploadForm" enctype="multipart/form-data">
-            <input type="file" name="files" id="fileInput" multiple required>
-            <button type="submit">Carica</button>
+            <input type="file" name="files" id="fileInput" multiple>
+            <button type="submit">Upload</button>
+        </form>
+
+        <h3>Or provide a URL to scrape</h3>
+        <p>The URL must be publicly accessible and not require authentication.</p>
+        <form id="uploadFormUrl">
+            <input type="text" id="urlInput" placeholder="URL to crawl" required>
+            <button type="submit">Crawl</button>
         </form>
         <p class="loading" id="loadingText">Uploading...</p>
     </div>
+
+    <div class="server-container" id="markdownContainer" style="display:none;">
+        <h2>🚀 Crawling completed!</h2>
+        <div id="markdownContent"
+            style="max-height:300px; overflow:auto; text-align:left; padding:1rem; background:#222; border-radius:10px; width:100%; margin-bottom:2rem; white-space:pre-wrap; color:#fff;">
+            Loading markdown content...
+        </div>
+        <button class="secondary-button" onclick="downloadMarkdown()">Download file</button>
+        <button onclick="uploadToRAG()" style="margin-top:2rem;">Upload to RAG</button>
+        <a class="white-link" href="/" style="margin-top:2rem;">Upload another file</a>
+    </div>
+
 
     <script>
         document.getElementById('uploadForm').addEventListener('submit', function (event) {
@@ -105,10 +150,84 @@
                     window.location.href = '/completeUpload.html';
                 })
                 .catch(error => {
-                    alert("Errore during upload");
-                    console.error(error);
+                    alert("Error during upload");
+                    console.error("Error during upload: ", error);
                 });
         });
+
+
+        // Handle URL submission to scrape
+        document.getElementById('uploadFormUrl').addEventListener('submit', function (event) {
+            event.preventDefault();
+            const url = document.getElementById('urlInput').value;
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                alert("Please enter a valid URL starting with http:// or https://");
+                return;
+            }
+            document.getElementById('loadingText').style.display = 'block';
+
+            fetch('http://localhost:8001/crawl/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ urlToScrape: url })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('initialContainer').style.display = 'none';
+                    document.getElementById('markdownContainer').style.display = 'flex';
+                    document.getElementById('markdownContent').textContent = data.markdown;
+                    window.generatedMarkdown = data.markdown;
+                })
+                .catch(error => {
+                    alert("Error in crawler service");
+                    console.error("Error in crawler service: ", error);
+                })
+                .finally(() => {
+                    document.getElementById('loadingText').style.display = 'none';
+                });
+        });
+
+
+        // Function to download the markdown file
+        function downloadMarkdown() {
+            fetch('http://localhost:8001/last-markdown/')
+                .then(res => res.json())
+                .then(data => {
+                    const blob = new Blob([data.markdown], { type: 'text/markdown;charset=utf-8' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    link.download = 'CRAWLED-LINK.md';
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                })
+                .catch(err => {
+                    alert("Errore nel download markdown");
+                    console.error(err);
+                });
+        }
+
+
+        // Function to upload the markdown file to RAG
+        function uploadToRAG() {
+            const markdown = window.generatedMarkdown || "";
+            const blob = new Blob([markdown], { type: 'text/plain;charset=utf-8' });
+            const formData = new FormData();
+            formData.append('files', blob, 'CRAWLED-SITE.txt');
+
+            fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            })
+                .then(res => res.json())
+                .then(data => {
+                    alert("Upload completed: " + data.message);
+                })
+                .catch(err => {
+                    console.error("Error during uploading: ", err);
+                    alert("Error during upload: " + err.message);
+                });
+        }
     </script>
 </body>
 

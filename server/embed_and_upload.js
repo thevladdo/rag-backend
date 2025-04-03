@@ -60,7 +60,7 @@ async function parseDocument(filePath) {
 // ----------------------------
 //  Parsing document in Docling preprocessor
 //  This function sends the document to the Docling microservice for parsing
-// ---------------------------- 
+// ----------------------------  
 async function parseDocumentDoclingMS(filePath) {
     const formData = new FormData();
     formData.append('file', fs.createReadStream(filePath));
@@ -70,11 +70,28 @@ async function parseDocumentDoclingMS(filePath) {
             headers: formData.getHeaders()
         });
         if (response.data.error) throw new Error(response.data.error);
-        return extractTextFromDoclingOutput(response.data);
+        let text = extractTextFromDoclingOutput(response.data);
+        text = sanitizeText(text);
+        return text;
+
     } catch (error) {
-        console.error("Error durting MS processing:", error);
+        console.error("Error during MS processing:", error);
         throw error;
     }
+}
+
+// ----------------------------
+//  Function to sanitize text
+//  This function normalizes line breaks, removes extra spaces, and trims the text
+// ----------------------------
+function sanitizeText(text) {
+    return text
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line && !/^[-=|_]+$/.test(line))
+        .join(' ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
 }
 
 
@@ -108,9 +125,13 @@ function chunkText(text, chunkSize = CONFIG.chunk.size, overlap = CONFIG.chunk.o
 //  Batch Embedding and Upload
 //  Each chunk maintains the original fileId as metadata in source field
 // ----------------------------
+
 async function embedAndUploadChunks(fileId, chunks) {
-    for (let i = 0; i < chunks.length; i += CONFIG.chunk.batchSize) {
-        const batch = chunks.slice(i, i + CONFIG.chunk.batchSize);
+    const filteredChunks = chunks.filter(isChunkValid);
+
+    for (let i = 0; i < filteredChunks.length; i += CONFIG.chunk.batchSize) {
+        const batch = filteredChunks.slice(i, i + CONFIG.chunk.batchSize);
+
         const embeddingsRes = await openai.embeddings.create({
             model: 'text-embedding-3-small',
             input: batch,
@@ -123,8 +144,12 @@ async function embedAndUploadChunks(fileId, chunks) {
         }));
 
         await index.upsert(vectors);
-        console.log(`✅ Uploaded batch ${i / CONFIG.chunk.batchSize + 1}/${Math.ceil(chunks.length / CONFIG.chunk.batchSize)}`);
+        console.log(`✅ Uploaded batch ${i / CONFIG.chunk.batchSize + 1}/${Math.ceil(filteredChunks.length / CONFIG.chunk.batchSize)}`);
     }
+}
+
+function isChunkValid(chunk) {
+    return chunk && chunk.trim().length > 30 && /[a-zA-Z]/.test(chunk);
 }
 
 

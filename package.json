@@ -6,9 +6,11 @@
   "scripts": {
     "prestart": "IF exist uploads ( echo uploads exists ) ELSE ( mkdir uploads && echo uploads created)",
     "start:rag": "node server/index.js",
-    "docker:build-docling": "docker build -t docling-microservice ./docling-microservice",
-    "start:docling": "docker run -p 8000:8000 docling-microservice",
-    "start": "npm run docker:build-docling && concurrently \"npm run start:rag\" \"npm run start:docling\""
+    "docker:build-docling": "docker build -t docling-ms ./docling-microservice",
+    "start:docling": "docker run --name docling-ms -p 8000:8000 docling-ms",
+    "docker:build-crawler": "docker build -t crawler-ms ./crawl-microservice",
+    "start:crawler": "docker run --name crawler-ms -p 8001:8001 crawler-ms",
+    "start": "npm run docker:build-docling && npm run docker:build-crawler && concurrently \"npm run start:docling\" \"npm run start:crawler\" \"npm run start:rag\""
   },
   "dependencies": {
     "@pinecone-database/pinecone": "^5.1.1",

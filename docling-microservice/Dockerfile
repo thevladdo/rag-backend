@@ -11,5 +11,5 @@ CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # torun the docker container, use the following commands:
 #
-# docker build -t docling-microservice .
-# docker run -p 8000:8000 docling-microservice
+# docker build -t docling-ms .
+# docker run --name docling-ms -p 8000:8000 docling-ms

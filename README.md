@@ -6,6 +6,7 @@
   <img src="https://img.shields.io/badge/OpenAI-412991?style=flat&logo=openai&logoColor=white" alt="OpenAI" />
   <img src="https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white" alt="Docker" />
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white" alt="Python" />
+  <a href="https://github.com/unclecode/crawl4ai"> <img src="https://raw.githubusercontent.com/unclecode/crawl4ai/main/docs/assets/powered-by-night.svg" alt="Powered by Crawl4AI" width="70"/> </a>
 </p>
 
 This repository implements a custom **Retrieval-Augmented Generation (RAG)** server using **Express.js**, **OpenAI**, **Pinecone**, and a dedicated **Docling** microservice for document preprocessing. Its modular architecture gives you complete control over the LLM APIs, allowing you to choose and switch between different models for embedding and generation while using a single vector database for retrieval.
@@ -32,22 +33,6 @@ A **RAG** system answers questions by retrieving the most relevant documents and
 
 ---
 
-## 📚 About Docling
-
-**Docling** is a microservice dedicated to converting complex documents into a structured JSON format.  
-- **Key Features:**
-  - **Text Extraction:**  
-    It automatically extracts text from documents while preserving the original structure.
-  - **Structured Output:**  
-    The output JSON includes detailed metadata such as section headers, paragraphs, and other text elements.
-- **Benefits:**
-  - **Context Preservation:**  
-    Keeping the document structure intact allows the RAG system to perform more intelligent chunking and weighting during retrieval.
-  - **Modularity:**  
-    By isolating document preprocessing, you can update or tweak this component without affecting the rest of the system.
-
----
-
 ## 🛠 Technologies and Modular Architecture
 
 ### Core Components
@@ -60,6 +45,8 @@ A **RAG** system answers questions by retrieving the most relevant documents and
   A vector database that stores and retrieves embeddings efficiently.
 - **Docling Microservice:**  
   Preprocesses uploaded documents and extracts structured text.
+- **Crawl4AI:** 
+  Handles advanced web scraping from public URLs. Converts webpages into Markdown, then sanitizes and filters the resulting content to ensure only meaningful chunks are embedded into Pinecone.
 - **Multer:**  
   Manages file uploads on the server.
 
@@ -177,6 +164,64 @@ fetch('/api/rag', {
 - **Scalability and Flexibility**: The modular design makes it easy to add new functionalities or integrate additional services (such as real-time TTS agents or specialized mini agents for different DB indices) without disrupting existing workflows.
 - **Cost and Resource Optimization**: Tailor models to specific tasks (e.g., smaller models for embeddings and more advanced models for generation) to optimize performance and manage costs effectively.
 - **Specialized Agents**: Enables the creation of mini agents, each focused on a specific index within the DB, providing highly targeted retrieval and processing. This can be particularly useful for applications such as real-time TTS or domain-specific query handling.
+
+---
+
+## 📚 About Docling
+
+**Docling** is a microservice dedicated to converting complex documents into a structured JSON format.  
+- **Key Features:**
+  - **Text Extraction:**  
+    It automatically extracts text from documents while preserving the original structure.
+  - **Structured Output:**  
+    The output JSON includes detailed metadata such as section headers, paragraphs, and other text elements.
+- **Benefits:**
+  - **Context Preservation:**  
+    Keeping the document structure intact allows the RAG system to perform more intelligent chunking and weighting during retrieval.
+  - **Modularity:**  
+    By isolating document preprocessing, you can update or tweak this component without affecting the rest of the system.
+
+---
+
+## 🕸️ About Crawl4AI
+**Crawl4AI** is an advanced asynchronous web scraping library built on Playwright. In this project, it is used as a dedicated microservice to extract clean, structured markdown content from web pages.
+
+- **Key Features:**
+  - Asynchronous scraping with full support for dynamic JavaScript-rendered websites.
+
+  - Outputs well-structured Markdown for consistent processing.
+
+  - Integrated via a FastAPI endpoint (/crawl/), enabling direct crawling from a user-provided URL.
+
+  - Seamlessly fits into the document ingestion pipeline, alongside PDF, DOCX, and HTML uploads.
+
+- **Smart Content Sanitization:**
+To ensure high-quality indexing and retrieval, all crawled content undergoes text cleaning and normalization, including:
+
+  - Removal of excessive line breaks and spacing.
+
+  - Trimming of empty lines and HTML artifacts.
+
+  - Whitespace collapsing to avoid bloated or meaningless text.
+
+- **Chunk Filtering Logic:**
+Before embeddings are generated, every chunk is evaluated. We discard chunks that:
+
+  - Are too short or contain only whitespace, newlines, or special characters.
+
+  - **Clean input = smart output**. Lack meaningful semantic content.
+
+  - Duplicate empty or template-based blocks.
+
+This helps keep your vector store clean and relevant, reducing noise and improving query performance.
+
+**License & Attribution**
+This project uses Crawl4AI for web data extraction.
+It is distributed under the Apache License 2.0, with an attribution clause.
+
+<a href="https://github.com/unclecode/crawl4ai"> <img src="https://img.shields.io/badge/Powered%20by-Crawl4AI-blue?style=flat-square" alt="Powered by Crawl4AI"/> </a>
+
+Please refer to the LICENSE file for full license details and obligations.
 
 ---
 
